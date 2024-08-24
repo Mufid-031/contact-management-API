@@ -14,6 +14,7 @@
   "author": "Mufid-031",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.18.0",
     "bcrypt": "^5.1.1",
     "express": "^4.19.2",
     "winston": "^3.14.2",
