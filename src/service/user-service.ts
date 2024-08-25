@@ -93,4 +93,21 @@ export class UserService {
         return toUserResponse(response);
     }
 
+    static async logout(user: User) {
+        const response = await prismaClient.user.update({
+            where: {
+                username: user.username
+            },
+            data: {
+                token: null
+            }
+        });
+
+        if (!response) {
+            throw new ResponseError(401, "Unauthorized");
+        }
+
+        return toUserResponse(response);
+    }
+
 }
