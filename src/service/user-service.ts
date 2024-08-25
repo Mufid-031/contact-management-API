@@ -76,14 +76,22 @@ export class UserService {
     }
 
     static async update(user: User, request: UpdateUserRequest): Promise<UserResponse> {
+
+        const updateRequest = Validation.validate(UserValidation.UPDATE, request);
+
+        if (updateRequest.name) {
+            user.name = updateRequest.name;
+        }
+
+        if (updateRequest.password) {
+            user.password = await bcrypt.hash(updateRequest.password, 10);
+        }
+
         const response = await prismaClient.user.update({
             where: {
                 username: user.username
             },
-            data: {
-                password: request.password,
-                name: request.name
-            }
+            data: user
         });
 
         if (!response) {
@@ -93,7 +101,7 @@ export class UserService {
         return toUserResponse(response);
     }
 
-    static async logout(user: User) {
+    static async logout(user: User): Promise<UserResponse> {
         const response = await prismaClient.user.update({
             where: {
                 username: user.username
@@ -102,10 +110,6 @@ export class UserService {
                 token: null
             }
         });
-
-        if (!response) {
-            throw new ResponseError(401, "Unauthorized");
-        }
 
         return toUserResponse(response);
     }

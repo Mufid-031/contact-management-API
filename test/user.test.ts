@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { web } from "../src/application/web";
 import { logger } from "../src/application/logging";
 import { UserTest } from "./test-utils";
+import bcrypt from "bcrypt";
 
 describe("POST /api/users", () => {
 
@@ -133,19 +134,33 @@ describe("PATCH /api/users/current", () => {
         await UserTest.delete();
     });
 
-    it("should be able to update user", async () => {
+    it("should be able to update user name", async () => {
         const response = await supertest(web)
             .patch("/api/users/current")
             .set("X-API-TOKEN", "test")
             .send({
-                password: "test",
-                name: "test",
+                name: "benar",
             });
 
         logger.debug(response.body);
         expect(response.status).toBe(200);
-        expect(response.body.data.username).toBe("test");
-        expect(response.body.data.name).toBe("test");
+        expect(response.body.data.name).toBe("benar");
+    });
+
+    it("should be able to update user password", async () => {
+        const response = await supertest(web)
+            .patch("/api/users/current")
+            .set("X-API-TOKEN", "test")
+            .send({
+                password: "benar",
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        
+        const user = await UserTest.get();
+        expect(await bcrypt.compare("benar", user.password)).toBe(true);
+
     });
 
     it("should reject update user if token is invalid", async () => {

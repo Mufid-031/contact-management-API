@@ -43,7 +43,8 @@ export class UserController {
 
     static async update(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const response = await UserService.update(req.user!, req.body as UpdateUserRequest);
+            const request: UpdateUserRequest = req.body as UpdateUserRequest;
+            const response = await UserService.update(req.user!, request);
             res.status(200).json({
                 data: response
             });
@@ -56,7 +57,7 @@ export class UserController {
         try {
             const response = await UserService.logout(req.user!);
             res.status(200).json({
-                data: "OK"
+                data: response
             })
         } catch (error) {
             next(error);
